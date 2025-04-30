@@ -7,16 +7,17 @@ const Home = () => {
 
 	const [data, setData] = useState ()
 
-	let url ="https://playground.4geeks.com/todo/openapi.json"
-	let options = {
-		method: "GET",
-		body: JSON.stringify(TodoList),
-		headers: {
-		  "Content-Type": "application/json"
-		}
-	}//La estructura anterior varía un poco a la que explica Javi, pero me ha gutado más, así la entendí mucho mejor en la clase de Alexander @alesanchezr
-
 	useEffect(()=>{
+		let url ="https://playground.4geeks.com/todo/users/jacksama"
+		let options = {
+			method: "GET",
+			//body: JSON.stringify(TodoList),
+			headers: {
+			"Content-Type": "application/json"
+			}
+	}//La estructura anterior varía un poco a la que explica Javi, pero me ha gutado más, así la entendí mucho mejor en la clase de Alexander @alesanchezr
+		console.log(options)
+
 		fetch(url, options)
 	  
 	  .then(respuesta => {
@@ -30,18 +31,18 @@ const Home = () => {
 	  })
 
 	  .then(body => {
-		console.log(`Este es el body del request`, body)
+		console.log(`Este es el body del request`, body);
+		setData(body.todos);
 	  })
 
 	  .catch(error => {
-		  // Manejo de errores
-		  console.log(error);
+		  console.log("Error en el Fetch", error);
 	  });
 	},[])
 	
 	return (
 		<div className="text-center">
-			<TodoList/>
+			<TodoList listaDesdeAPI={data}/>
 		</div>
 	);
 
