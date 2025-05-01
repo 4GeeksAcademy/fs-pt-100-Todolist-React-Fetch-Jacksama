@@ -64,7 +64,7 @@ export const TodoList = ({listaDesdeAPI = []}) => {
     return (
         <>
             <div className="container p-3 text-center">
-                <h2 fs-1>MI LISTA</h2>
+                <h2>MI LISTA</h2>
                 </div> 
 
                 <div className="card">
