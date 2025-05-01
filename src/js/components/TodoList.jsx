@@ -7,7 +7,7 @@ export const TodoList = ({listaDesdeAPI = []}) => {
 
     useEffect(()=>{
             if (listaDesdeAPI?.length >0) {
-                setLista(listaDesdeAPI.map(item => item.label));
+                setLista(listaDesdeAPI);
             }
         },[listaDesdeAPI])
 
@@ -20,24 +20,34 @@ export const TodoList = ({listaDesdeAPI = []}) => {
         if (tarea.trim()=== "") return;
 
 
-        const nuevaLista = [...lista, tarea];
-        setLista(nuevaLista);
-        setTarea("");
-        sincronizadorConAPI(nuevaLista);
+        //const nuevaLista = [...lista, tarea];
+        //setLista(nuevaLista);
+        //setTarea("");
+        sincronizadorConAPI();
     }
 
-    const removerTarea = (index) => {
-        const nuevaLista = lista.filter((__, i) => i !== index);
-        setLista(nuevaLista);
-        sincronizadorConAPI(nuevaLista);
+    const removerTarea = (id) => {
+        fetch (`https://playground.4geeks.com/todo/todos/${id}`,{
+            method: "DELETE"
+        })
+
+        .then(response => {
+            if(response.ok){
+        const nuevaLista = lista.filter((item) => item.id !== id);
+            setLista(nuevaLista);  
+            }
+        }) 
+
+        
     }
  
     const sincronizadorConAPI = () => {
-        const url = "https://playground.4geeks.com/todo/users/jacksama";
-        const payload = lista.map(t => ({
-            label: t,
-            done: false
-        }));
+        const url = "https://playground.4geeks.com/todo/todos/jacksama";
+        const payload = {
+            label: tarea,
+            is_done: false
+        };
+        
 
 
     fetch(url, {
@@ -51,10 +61,17 @@ export const TodoList = ({listaDesdeAPI = []}) => {
     .then(response => {
         if (response.ok) {
             console.log("Tareas sincronizadas con la API");
+            return response.json()
         }
         else{
             console.error("Error al sincronizar con la API", response.status);
         }
+    })
+
+    .then(data =>{
+        console.log(data)
+        setLista([...lista, data])
+        setTarea("")
     })
 
     .catch(error => console.error("Error en POST", error));
@@ -88,8 +105,8 @@ export const TodoList = ({listaDesdeAPI = []}) => {
 
                     lista.map((e, index)=>(
                         <li key={index} className="list-group-item d-flex justify-content-between delete-icon">
-                            {e}
-                        <span className="delete-btn" onClick={()=>removerTarea(index)}>🗑️</span>    
+                            {e.label}
+                        <span className="delete-btn" onClick={()=>removerTarea(e.id)}>🗑️</span>    
                     </li>
                     ))
                     )}
