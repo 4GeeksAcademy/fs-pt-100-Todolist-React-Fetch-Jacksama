@@ -1,52 +1,59 @@
 import React, { useEffect, useState } from "react";
 import { TodoList } from "./TodoList.jsx";
 
-
 //create your first component
 const Home = () => {
+  const [data, setData] = useState();
 
-	const [data, setData] = useState ()
+  useEffect(() => {
+    let url = "https://playground.4geeks.com/todo/users/jacksama";
+    let options = {
+      method: "GET",
+      //body: JSON.stringify(TodoList),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    fetch(url, options)
+      .then((respuesta) => {
+        if (respuesta.ok) {
+          console.log("Usuario encontrado");
+          return respuesta.json();
+        } else if (respuesta.status === 404) {
+          console.log("Usuario no encontrado. Creando...");
+          return fetch(url, {
+            method: "POST",
+            headers: {
+              "content-Type": "aplication/jason",
+            },
+          }).then((res) => {
+            if (res.ok) {
+              console.log("Usuario creado exitosamente.");
+              return { todos: [] };
+            } else {
+              throw new Error("Error al crear el usuario.");
+            }
+          });
+        } else {
+          throw new Error(`Error al buscar usuario: ${respuesta.status}`);
+        }
+      })
 
-	useEffect(()=>{
-		let url ="https://playground.4geeks.com/todo/users/jacksama"
-		let options = {
-			method: "GET",
-			//body: JSON.stringify(TodoList),
-			headers: {
-			"Content-Type": "application/json"
-			}
-	}//La estructura anterior varía un poco a la que explica Javi, pero me ha gutado más, así la entendí mucho mejor en la clase de Alexander @alesanchezr
-		console.log(options)
+      .then((body) => {
+        console.log("Tareas obtenidas", body);
+        setData(body.todos);
+      })
 
-		fetch(url, options)
-	  
-	  .then(respuesta => {
-		  if (respuesta.status >=200 && respuesta.status <=300){
-			console.log("El request ha sido ejecutado correctamente")
-			return respuesta.json();
-		  }
-		  else{
-			console.log(`Hubo un error ${respuesta.status} en el request`)
-		  } 
-	  })
+      .catch((error) => {
+        console.log("Error en el Fetch", error);
+      });
+  }, []);
 
-	  .then(body => {
-		console.log(`Este es el body del request`, body);
-		setData(body.todos);
-	  })
-
-	  .catch(error => {
-		  console.log("Error en el Fetch", error);
-	  });
-	},[])
-	
-	return (
-		<div className="text-center">
-			<TodoList listaDesdeAPI={data}/>
-		</div>
-	);
-
+  return (
+    <div className="text-center">
+      <TodoList listaDesdeAPI={data} />
+    </div>
+  );
 };
-
 
 export default Home;
